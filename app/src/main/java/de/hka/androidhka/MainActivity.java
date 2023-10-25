@@ -2,25 +2,22 @@ package de.hka.androidhka;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.nabinbhandari.android.permissions.PermissionHandler;
+import com.nabinbhandari.android.permissions.Permissions;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        Log.i("MainActivity", "onResume");
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +31,15 @@ public class MainActivity extends AppCompatActivity {
         stringList.add("Noch ein String!");
         stringList.add("Da schau her!");
 
+        Button btnMap = this.findViewById(R.id.btnMap);
         Button btnClick = this.findViewById(R.id.btnClick);
         Button btnNext = this.findViewById(R.id.btnNext);
         TextView txtClick = this.findViewById(R.id.txtOutput);
+
+        btnMap.setOnClickListener(view -> {
+            Intent intent = new Intent(this, MapActivity.class);
+            this.startActivity(intent);
+        });
 
         btnClick.setOnClickListener(view -> {
             Random random = new Random();

@@ -36,6 +36,17 @@
         android:textSize="26sp" />
 
     <Button
+        android:id="@+id/btnMap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/btnClick"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/map" />
+
+    <Button
         android:id="@+id/btnClick"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
