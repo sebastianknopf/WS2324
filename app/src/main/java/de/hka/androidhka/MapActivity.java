@@ -15,12 +15,21 @@ import com.nabinbhandari.android.permissions.Permissions;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+
+import de.hka.androidhka.network.EfaApiClient;
+import de.hka.androidhka.objects.EfaCoordResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MapActivity extends AppCompatActivity {
 
@@ -57,6 +66,20 @@ public class MapActivity extends AppCompatActivity {
         IMapController mapController = mapView.getController();
         mapController.setZoom(14.0);
         mapController.setCenter(startPoint);
+
+        this.mapView.addMapListener(new MapListener() {
+            @Override
+            public boolean onScroll(ScrollEvent event) {
+                loadClosestStops(mapView.getMapCenter().getLatitude(), mapView.getMapCenter().getLongitude());
+                return false;
+            }
+
+            @Override
+            public boolean onZoom(ZoomEvent event) {
+                loadClosestStops(mapView.getMapCenter().getLatitude(), mapView.getMapCenter().getLongitude());
+                return false;
+            }
+        });
     }
 
     @Override
@@ -131,5 +154,32 @@ public class MapActivity extends AppCompatActivity {
     {
         String authorizationString = String.format("%s:%s", username, password);
         return "Basic " + Base64.encodeToString(authorizationString.getBytes(StandardCharsets.UTF_8), Base64.DEFAULT);
+    }
+
+    private void loadClosestStops(double latitude, double longitude) {
+         Call<EfaCoordResponse> efaCall = EfaApiClient
+                .getInstance()
+                .getClient()
+                .loadStopsWithinRadius(
+                        EfaApiClient
+                                .getInstance()
+                                .createCoordinateString(
+                                        latitude,
+                                        longitude
+                                ),
+                        10000
+                );
+
+         efaCall.enqueue(new Callback<EfaCoordResponse>() {
+             @Override
+             public void onResponse(Call<EfaCoordResponse> call, Response<EfaCoordResponse> response) {
+                 Log.d("MapActivity", String.format("Response %d Locations", response.body().getLocations().size()));
+             }
+
+             @Override
+             public void onFailure(Call<EfaCoordResponse> call, Throwable t) {
+                 Log.d("MapActivity", "Failure");
+             }
+         });
     }
 }
